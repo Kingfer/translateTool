@@ -25,7 +25,6 @@ function translate(selectionText, fromStr, toStr) {
     $.ajax({
         url: 'https://api.fanyi.baidu.com/api/trans/vip/translate',
         type: 'get',
-        async: false,
         dataType: 'jsonp',
         data: {
             q: query,
