@@ -4,14 +4,16 @@
  */
 var ZH = "zh";
 var EN = "en";
+var JP = "jp";
 var AUTO = "auto";
 function genericOnClick(info, tab) {
     console.log(info.selectionText);
-    translate(info.selectionText, EN, ZH);
+    var orgStr = "";
+    translate(info.selectionText, AUTO, ZH, orgStr);
 }
 
-function translate(selectionText, fromStr, toStr) {
-	//todo begin
+function translate(selectionText, fromStr, toStr, orgStr) {
+	//todo start
 	//todo 申请百度翻译开发者
     var appid = 'your appId';
     var key = 'your key';
@@ -25,6 +27,7 @@ function translate(selectionText, fromStr, toStr) {
     $.ajax({
         url: 'https://api.fanyi.baidu.com/api/trans/vip/translate',
         type: 'get',
+        async: false,
         dataType: 'jsonp',
         data: {
             q: query,
@@ -35,7 +38,21 @@ function translate(selectionText, fromStr, toStr) {
             sign: sign
         },
         success: function (data) {
-            alert((data.trans_result)[0].dst);
+            var strPre = "";
+            var strSuf = "\r\n";
+            if(toStr==ZH){
+                strPre="中：";
+                orgStr += strPre + (data.trans_result)[0].dst + strSuf;
+                translate(selectionText, AUTO, EN, orgStr);
+            }else if(toStr==EN){
+                strPre="英：";
+                orgStr += strPre + (data.trans_result)[0].dst + strSuf;
+                translate(selectionText, AUTO, JP, orgStr);
+            }else if(toStr==JP){
+                strPre="日：";
+                orgStr += strPre + (data.trans_result)[0].dst;
+                alert(orgStr);
+            }
         }
     });
 }
@@ -48,5 +65,4 @@ for (var i = 0; i < contexts.length; i++) {
         "title": title, "contexts": [context],
         "onclick": genericOnClick
     });
-    console.log("'" + context + "' item:" + id);
 }
