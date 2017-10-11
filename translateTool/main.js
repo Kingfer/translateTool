@@ -1,27 +1,27 @@
 /**
  *author:kf.huang
- *instroduction:a little word translate tool used in Google Chrome 
+ *instroduction:a little word translate tool used in Google Chrome
  */
 var ZH = "zh";
 var EN = "en";
 var JP = "jp";
 var AUTO = "auto";
+var STEP = [ZH,EN,JP,"out"];
+var STEPDESC = ["中：","英：","日：","输出"];
 function genericOnClick(info, tab) {
-    console.log(info.selectionText);
-    var orgStr = "";
-    translate(info.selectionText, AUTO, ZH, orgStr);
+    translate(info.selectionText, AUTO, 0, "");
 }
 
-function translate(selectionText, fromStr, toStr, orgStr) {
-	//todo start
-	//todo 申请百度翻译开发者
+function translate(selectionText, fromStr, stepCount, orgStr) {
+    //todo start
+    //todo 申请百度翻译开发者
     var appid = 'your appId';
     var key = 'your key';
-	//todo end
+    //todo end
     var salt = (new Date).getTime();
     var query = selectionText;
     var from = fromStr;
-    var to = toStr;
+    var to = STEP[stepCount];
     var str1 = appid + query + salt + key;
     var sign = MD5(str1);
     $.ajax({
@@ -38,20 +38,14 @@ function translate(selectionText, fromStr, toStr, orgStr) {
             sign: sign
         },
         success: function (data) {
-            var strPre = "";
+            var strPre=STEPDESC[stepCount];
             var strSuf = "\r\n";
-            if(toStr==ZH){
-                strPre="中：";
-                orgStr += strPre + (data.trans_result)[0].dst + strSuf;
-                translate(selectionText, AUTO, EN, orgStr);
-            }else if(toStr==EN){
-                strPre="英：";
-                orgStr += strPre + (data.trans_result)[0].dst + strSuf;
-                translate(selectionText, AUTO, JP, orgStr);
-            }else if(toStr==JP){
-                strPre="日：";
+            if(STEP.length == (stepCount+2)){
                 orgStr += strPre + (data.trans_result)[0].dst;
                 alert(orgStr);
+            }else{
+                orgStr += strPre + (data.trans_result)[0].dst + strSuf;
+                translate(selectionText, AUTO, stepCount+1, orgStr);
             }
         }
     });
